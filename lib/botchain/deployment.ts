@@ -45,6 +45,14 @@ export function getDeployment(chainId: BotChainId): Deployment {
   return DEPLOYMENTS[chainId];
 }
 
+export function getContractAddress(chainId?: BotChainId): Address {
+  if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_CONTRACT_ADDRESS) {
+    return process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address;
+  }
+  const id = chainId ?? 968;
+  return DEPLOYMENTS[id]?.address ?? ZERO_ADDRESS;
+}
+
 /**
  * True when this chain's deployment is usable. Gate the UI on this.
  *

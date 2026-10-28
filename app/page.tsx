@@ -1,35 +1,85 @@
+"use client";
+
+import { useReadContract, useBlock } from "wagmi";
 import PageShell from "@/components/layout/PageShell";
-import BotChainGate from "@/components/botchain/BotChainGate";
-import Panel from "@/components/ui/Panel";
-import { app } from "@/lib/app-config";
+import GalleryWall, { type GalleryLot } from "@/components/gallery/GalleryWall";
+import LimitationBlock from "@/components/gallery/LimitationBlock";
+import { sealedAbi } from "@/lib/botchain/abi";
+import { getContractAddress } from "@/lib/botchain/deployment";
+import { phaseAt } from "@/lib/sealed";
 
-/**
- * Scaffold home page. Replace the body; keep the shape.
- *
- * The shape is the point: read-only content sits outside `BotChainGate`, and only the part that
- * actually transacts sits inside it. A visitor with no wallet should still see what the app is.
- */
 export default function Home() {
-  return (
-    <PageShell title={app.name} description={app.tagline}>
-      <div className="flex flex-col gap-4">
-        <Panel>
-          <p className="text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-            This is the template scaffold. Rewrite <code>lib/app-config.ts</code>,{" "}
-            <code>lib/botchain/abi.ts</code> and this page.
-          </p>
-        </Panel>
+  const contractAddress = getContractAddress();
+  const { data: block } = useBlock({ watch: true });
+  const currentTime = block ? block.timestamp : BigInt(Math.floor(Date.now() / 1000));
 
-        <BotChainGate>
-          <Panel>
-            <p className="text-[11px] uppercase tracking-[0.04em]" style={{ color: "var(--text-secondary)" }}>
-              The one transaction
-            </p>
-            <p className="mt-2 text-[13px]" style={{ color: "var(--text-primary)" }}>
-              {app.theTx}
-            </p>
-          </Panel>
-        </BotChainGate>
+  // Query newest 24 lots
+  const { data: latestLots, isLoading } = useReadContract({
+    address: contractAddress as `0x${string}`,
+    abi: sealedAbi,
+    functionName: "latest",
+    args: [0n, 24n],
+    query: {
+      refetchInterval: 5000,
+    },
+  });
+
+  const { data: lotCount } = useReadContract({
+    address: contractAddress as `0x${string}`,
+    abi: sealedAbi,
+    functionName: "auctionCount",
+    query: {
+      refetchInterval: 5000,
+    },
+  });
+
+  // Map raw on-chain lots to GalleryLot with calculated phases
+  const lots: GalleryLot[] = (latestLots || []).map((l, index) => {
+    // contract latest returns newest first, so id = lotCount - index
+    const total = lotCount ? Number(lotCount) : (latestLots?.length || 0);
+    const id = BigInt(total - index);
+
+    const phase = phaseAt(
+      {
+        commitEnd: l.commitEnd,
+        revealEnd: l.revealEnd,
+        settled: l.settled,
+      },
+      currentTime
+    );
+
+    return {
+      id,
+      seller: l.seller,
+      commitEnd: l.commitEnd,
+      revealEnd: l.revealEnd,
+      reserve: l.reserve,
+      top: l.top,
+      second: l.second,
+      winner: l.winner,
+      bidders: l.bidders,
+      revealed: l.revealed,
+      settled: l.settled,
+      title: l.title,
+      phase,
+    };
+  });
+
+  return (
+    <PageShell>
+      <div className="flex flex-col gap-12">
+        {isLoading ? (
+          <div className="py-24 text-center font-serif text-[22px] italic text-[#B9C7BD]">
+            Viewing the gallery wall...
+          </div>
+        ) : (
+          <GalleryWall lots={lots} currentTime={currentTime} />
+        )}
+
+        {/* What a sealed bid can't do */}
+        <div className="pt-6 border-t border-[#214236]">
+          <LimitationBlock />
+        </div>
       </div>
     </PageShell>
   );
