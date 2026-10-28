@@ -210,6 +210,7 @@ export default function NewLotPage() {
               size="lg"
               loading={loading}
               disabled={!isTitleValid || !isReserveValid}
+              onClick={handleSubmit}
               className="w-full mt-2"
             >
               Inscribe Lot on Wall

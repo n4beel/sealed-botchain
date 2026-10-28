@@ -355,7 +355,11 @@ console.log("  Lot 5 (ID 5): Open (0 bids)");
 console.log("  Lot 6 (ID 6): Cancelled");
 console.log("=======================================================\n");
 
-const envContent = `NEXT_PUBLIC_CONTRACT_ADDRESS=${contractAddress}
+const envContent = `NEXT_PUBLIC_BOTCHAIN_NETWORK=testnet
+NEXT_PUBLIC_BOHR_RPC=${RPC}
+NEXT_PUBLIC_CONTRACT_968=${contractAddress}
+NEXT_PUBLIC_CONTRACT_ADDRESS=${contractAddress}
+NEXT_PUBLIC_DEPLOY_BLOCK_968=1
 NEXT_PUBLIC_CHAIN_ID=${CHAIN_ID}
 NEXT_PUBLIC_RPC_URL=${RPC}
 `;

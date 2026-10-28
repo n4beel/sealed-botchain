@@ -36,7 +36,10 @@ export const DEPLOYMENTS: Record<BotChainId, Deployment> = {
     deployBlock: BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK_677 ?? "0"),
   },
   968: {
-    address: (process.env.NEXT_PUBLIC_CONTRACT_968 as Address) ?? ZERO_ADDRESS,
+    address:
+      (process.env.NEXT_PUBLIC_CONTRACT_968 as Address) ??
+      (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address) ??
+      ZERO_ADDRESS,
     deployBlock: BigInt(process.env.NEXT_PUBLIC_DEPLOY_BLOCK_968 ?? "0"),
   },
 };
@@ -46,9 +49,8 @@ export function getDeployment(chainId: BotChainId): Deployment {
 }
 
 export function getContractAddress(chainId?: BotChainId): Address {
-  if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_CONTRACT_ADDRESS) {
-    return process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address;
-  }
+  const custom = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as Address | undefined;
+  if (custom && custom !== ZERO_ADDRESS) return custom;
   const id = chainId ?? 968;
   return DEPLOYMENTS[id]?.address ?? ZERO_ADDRESS;
 }

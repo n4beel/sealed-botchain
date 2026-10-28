@@ -48,6 +48,15 @@ export default function LotDetailPage({ params }: { params: Promise<{ id: string
     query: { refetchInterval: 4000 },
   });
 
+  // On-chain phase
+  const { data: onChainPhase } = useReadContract({
+    address: contractAddress,
+    abi: sealedAbi,
+    functionName: "phase",
+    args: [lotId],
+    query: { refetchInterval: 2000 },
+  });
+
   // On-chain caller's bid data
   const { data: userBid, refetch: refetchBid } = useReadContract({
     address: contractAddress,
@@ -131,14 +140,17 @@ export default function LotDetailPage({ params }: { params: Promise<{ id: string
     );
   }
 
-  const phase = phaseAt(
-    {
-      commitEnd: lot.commitEnd,
-      revealEnd: lot.revealEnd,
-      settled: lot.settled,
-    },
-    currentTime
-  );
+  const phase =
+    onChainPhase !== undefined
+      ? Number(onChainPhase)
+      : phaseAt(
+          {
+            commitEnd: lot.commitEnd,
+            revealEnd: lot.revealEnd,
+            settled: lot.settled,
+          },
+          currentTime
+        );
 
   const reserveEth = formatEther(lot.reserve);
   const isSeller = address && lot.seller.toLowerCase() === address.toLowerCase();
