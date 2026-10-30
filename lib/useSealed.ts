@@ -1,5 +1,7 @@
 "use client";
 
+import { activeBotChain } from "@/lib/botchain/chain";
+import { assertActiveChain, checkedWrite, waitSuccess } from "@/lib/useChainWrite";
 import { usePublicClient, useWalletClient, useAccount } from "wagmi";
 import { useCallback, useState } from "react";
 import { parseEther, type Address } from "viem";
@@ -38,8 +40,10 @@ export function useSealedContract() {
           args: [title, reserveWei, BigInt(commitSecs), BigInt(revealSecs)],
         });
 
-        const hash = await walletClient.writeContract(request);
-        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+        await assertActiveChain(walletClient);
+
+        const hash = await checkedWrite(walletClient, publicClient, request);
+        const receipt = await waitSuccess(publicClient, hash);
         toast("success", "Lot inscribed on the gallery wall.");
         return receipt;
       } catch (err) {
@@ -102,8 +106,10 @@ export function useSealedContract() {
           value: depositWei,
         });
 
-        const hash = await walletClient.writeContract(request);
-        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+        await assertActiveChain(walletClient);
+
+        const hash = await checkedWrite(walletClient, publicClient, request);
+        const receipt = await waitSuccess(publicClient, hash);
         toast("success", "Sealed bid placed. Your secret salt is stored safely.");
         return receipt;
       } catch (err) {
@@ -136,8 +142,10 @@ export function useSealedContract() {
           args: [id, amountWei, salt],
         });
 
-        const hash = await walletClient.writeContract(request);
-        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+        await assertActiveChain(walletClient);
+
+        const hash = await checkedWrite(walletClient, publicClient, request);
+        const receipt = await waitSuccess(publicClient, hash);
         toast("success", "Sealed bid revealed successfully.");
         return receipt;
       } catch (err) {
@@ -169,8 +177,10 @@ export function useSealedContract() {
           args: [id],
         });
 
-        const hash = await walletClient.writeContract(request);
-        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+        await assertActiveChain(walletClient);
+
+        const hash = await checkedWrite(walletClient, publicClient, request);
+        const receipt = await waitSuccess(publicClient, hash);
         toast("success", "Auction settled.");
         return receipt;
       } catch (err) {
@@ -202,8 +212,10 @@ export function useSealedContract() {
           args: [id],
         });
 
-        const hash = await walletClient.writeContract(request);
-        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+        await assertActiveChain(walletClient);
+
+        const hash = await checkedWrite(walletClient, publicClient, request);
+        const receipt = await waitSuccess(publicClient, hash);
         toast("success", "Claim credited to your pending till.");
         return receipt;
       } catch (err) {
@@ -235,8 +247,10 @@ export function useSealedContract() {
           args: [id],
         });
 
-        const hash = await walletClient.writeContract(request);
-        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+        await assertActiveChain(walletClient);
+
+        const hash = await checkedWrite(walletClient, publicClient, request);
+        const receipt = await waitSuccess(publicClient, hash);
         toast("success", "Lot withdrawn from wall.");
         return receipt;
       } catch (err) {
@@ -266,8 +280,10 @@ export function useSealedContract() {
         functionName: "withdraw",
       });
 
-      const hash = await walletClient.writeContract(request);
-      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      await assertActiveChain(walletClient);
+
+      const hash = await checkedWrite(walletClient, publicClient, request);
+      const receipt = await waitSuccess(publicClient, hash);
       toast("success", "Withdrawn successfully to your wallet.");
       return receipt;
     } catch (err) {

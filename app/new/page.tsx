@@ -113,7 +113,7 @@ export default function NewLotPage() {
                 <input
                   id="reserve"
                   type="number"
-                  step="0.01"
+                  step="any"
                   min="0.0001"
                   value={reserve}
                   onChange={(e) => setReserve(e.target.value)}

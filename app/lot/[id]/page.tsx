@@ -1,5 +1,6 @@
 "use client";
 
+import { activeBotChain } from "@/lib/botchain/chain";
 import { use, useEffect, useState } from "react";
 import { useAccount, useReadContract, usePublicClient, useBlock } from "wagmi";
 import { formatEther, parseEther, type Address } from "viem";
@@ -343,7 +344,7 @@ export default function LotDetailPage({ params }: { params: Promise<{ id: string
                       </label>
                       <input
                         type="number"
-                        step="0.01"
+                        step="any"
                         min={reserveEth}
                         value={bidAmount}
                         onChange={(e) => {
@@ -364,7 +365,7 @@ export default function LotDetailPage({ params }: { params: Promise<{ id: string
                       </label>
                       <input
                         type="number"
-                        step="0.01"
+                        step="any"
                         min={bidAmount || reserveEth}
                         value={depositAmount}
                         onChange={(e) => setDepositAmount(e.target.value)}
@@ -452,7 +453,7 @@ export default function LotDetailPage({ params }: { params: Promise<{ id: string
                           <label className="font-mono text-[11px] text-[#F2EFE6]">Bid Amount (BOT)</label>
                           <input
                             type="number"
-                            step="0.01"
+                            step="any"
                             value={manualAmount}
                             onChange={(e) => setManualAmount(e.target.value)}
                             placeholder="Exact bid amount"
