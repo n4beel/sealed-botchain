@@ -12,7 +12,7 @@ import { commitmentFor, newSalt, saltStore, type StoredBid } from "./sealed";
 import { useToast } from "@/components/ui/Toast";
 
 export function useSealedContract() {
-  const publicClient = usePublicClient(); // stable-hook-result
+  const publicClient = usePublicClient({ chainId: activeBotChain.id }); // stable-hook-result
   const { data: walletClient } = useWalletClient(); // stable-hook-result
   const { address } = useAccount();
   const { toast } = useToast();

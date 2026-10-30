@@ -61,6 +61,18 @@ describe("writes are pinned to this build's chain", () => {
     expect(bad).toEqual([]);
   });
 
+  it("the contract and the public client follow the build's network, not the wallet's", () => {
+    const bad: string[] = [];
+    for (const root of ROOTS)
+      for (const f of walk(root)) {
+        if (/(NetworkBadge|TxStatus|ConnectButton|BotChainGate|useChainWrite)/.test(f)) continue;
+        const src = readFileSync(f, "utf8");
+        if (/\busePublicClient\(\s*\)/.test(src)) bad.push(`${relative(".", f)}: usePublicClient()`);
+        if (/isBotChainId\(chainId\)\s*\?\s*chainId\s*:\s*968|chainId \?\? activeBotChain\.id/.test(src)) bad.push(`${relative(".", f)}: deployment chosen by wallet chain`);
+      }
+    expect(bad).toEqual([]);
+  });
+
   it("useChainWrite passes the active chain id on both write functions", () => {
     const src = readFileSync("lib/useChainWrite.ts", "utf8");
     expect(src.match(/chainId: activeBotChain\.id/g)?.length).toBe(2);

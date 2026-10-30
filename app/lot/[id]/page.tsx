@@ -25,7 +25,7 @@ export default function LotDetailPage({ params }: { params: Promise<{ id: string
   const lotId = BigInt(resolvedParams.id);
 
   const { address, isConnected } = useAccount();
-  const publicClient = usePublicClient(); // stable-hook-result
+  const publicClient = usePublicClient({ chainId: activeBotChain.id }); // stable-hook-result
   const contractAddress = getContractAddress() as Address;
 
   const { data: block } = useBlock({ watch: true });
